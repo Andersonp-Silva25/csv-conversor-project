@@ -1,8 +1,10 @@
 package com.trybe.conversorcsv;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -37,22 +39,35 @@ public class Conversor {
   public void converterPasta(File pastaDeEntradas, File pastaDeSaidas) throws IOException {
     // TODO: Implementar.
     File[] arquivosEntrada = pastaDeEntradas.listFiles();
+    pastaDeSaidas.mkdir();
 
     for (File arquivo : arquivosEntrada) {
+
       FileReader leitorArquivo = new FileReader(arquivo);
       BufferedReader bufferedLeitor = new BufferedReader(leitorArquivo);
 
+      FileWriter escritorArquivo =
+          new FileWriter(pastaDeSaidas.getPath() + File.separator + arquivo.getName());
+      BufferedWriter bufferedEscritor = new BufferedWriter(escritorArquivo);
+
       String linhas = bufferedLeitor.readLine();
+      bufferedEscritor.write(linhas);
 
       while (linhas != null) {
         linhas = bufferedLeitor.readLine();
         if (linhas != null) {
-          String[] linha = linhas.split(",");
-          System.out.println(converteCpf(linha[3]));
+          String[] coluna = linhas.split(",");
+          String v = ",";
+          String nome = nomeUpperCase(coluna[0]);
+          String data = converteData(coluna[1]);
+          String email = coluna[2];
+          String cpf = converteCpf(coluna[3]);
+          bufferedEscritor.write("\n" + nome + v + data + v + email + v + cpf);
         }
       }
 
-      fecharArquivo(leitorArquivo, bufferedLeitor);
+      bufferedEscritor.flush();
+      fecharArquivo(leitorArquivo, bufferedLeitor, escritorArquivo, bufferedEscritor);
     }
 
   }
@@ -64,12 +79,16 @@ public class Conversor {
   /**
    * Metódo para converter a data no formato ISO-8601: aaaa-mm-dd.
    **/
-  public String converteData(String data) {
-    String[] arrayData = data.split("/");
-    String ano = arrayData[2];
-    String mes = arrayData[1];
-    String dia = arrayData[0];
-    return ano + "-" + mes + "-" + dia;
+  public String converteData(String linha) {
+    if (linha.contains("Nome completo,Data de nascimento,Email,CPF")) {
+      return linha + "\n";
+    } else {
+      String[] arrayData = linha.split("/");
+      String ano = arrayData[2];
+      String mes = arrayData[1];
+      String dia = arrayData[0];
+      return ano + "-" + mes + "-" + dia;
+    }
   }
 
   /**
@@ -83,10 +102,13 @@ public class Conversor {
     return part1 + "." + part2 + "." + part3 + "-" + part4;
   }
 
-  private void fecharArquivo(FileReader fileReader, BufferedReader bufferedReader) {
+  private void fecharArquivo(FileReader fileReader, BufferedReader bufferedReader,
+      FileWriter fileWriter, BufferedWriter bufferedWriter) {
     try {
       fileReader.close();
       bufferedReader.close();
+      fileWriter.close();
+      bufferedWriter.close();
     } catch (Exception e) {
       e.printStackTrace();
     }
