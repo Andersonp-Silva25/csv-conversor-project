@@ -80,15 +80,11 @@ public class Conversor {
    * Metódo para converter a data no formato ISO-8601: aaaa-mm-dd.
    **/
   public String converteData(String linha) {
-    if (linha.contains("Nome completo,Data de nascimento,Email,CPF")) {
-      return linha + "\n";
-    } else {
-      String[] arrayData = linha.split("/");
-      String ano = arrayData[2];
-      String mes = arrayData[1];
-      String dia = arrayData[0];
-      return ano + "-" + mes + "-" + dia;
-    }
+    String[] arrayData = linha.split("/");
+    String ano = arrayData[2];
+    String mes = arrayData[1];
+    String dia = arrayData[0];
+    return ano + "-" + mes + "-" + dia;
   }
 
   /**
